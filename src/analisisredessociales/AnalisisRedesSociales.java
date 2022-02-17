@@ -4,6 +4,9 @@
  */
 package analisisredessociales;
 
+import analisisredessociales.interfaz.VentanaInicio;
+import javax.swing.SwingUtilities;
+
 /**
  *
  * @author dayan
@@ -14,7 +17,9 @@ public class AnalisisRedesSociales {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        // TODO code application logic here
+        System.setProperty("org.graphstream.ui", "swing");
+        SwingUtilities.invokeLater(() -> {
+            new VentanaInicio().setVisible(true);
+        });
     }
-    
 }
