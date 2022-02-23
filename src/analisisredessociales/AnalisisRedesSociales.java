@@ -5,7 +5,11 @@
 package analisisredessociales;
 
 import analisisredessociales.interfaz.VentanaInicio;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 
 /**
  *
@@ -18,8 +22,15 @@ public class AnalisisRedesSociales {
      */
     public static void main(String[] args) {
         System.setProperty("org.graphstream.ui", "swing");
+        try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException ex) {
+            Logger.getLogger(AnalisisRedesSociales.class.getName()).log(Level.SEVERE, null, ex);
+        }
         SwingUtilities.invokeLater(() -> {
-            new VentanaInicio().setVisible(true);
+            VentanaInicio vi = new VentanaInicio();
+            vi.setVisible(true);
+            vi.setExtendedState(java.awt.Frame.MAXIMIZED_BOTH);
         });
     }
 }
