@@ -5,62 +5,58 @@
  */
 package analisisredessociales.estructuras;
 
-import java.util.ArrayList;
+import analisisredessociales.dominio.Usuario;
+import analisisredessociales.estructuras.RedSocial;
 
-public class Grafo
-{
+// Java program to count islands in boolean 2D matrix
+import java.util.*;
+import java.lang.*;
+import java.io.*;
 
-    public int [][] adjmatrix; 
-    public int vertices;
+class Islas {
 
+	static final int FILA = 5, COL = 5;
 
-    public Grafo(int vertices) 
-    {
-        adjmatrix = new int[vertices][vertices];            
-        this.vertices = vertices;                           
+	boolean perimetro(int M[][], int fila, int columna,
+				boolean visitado[][])
+	{
 
+		return (fila >= 0) && (fila < FILA) && (columna >= 0) && (columna < COL) && (M[fila][columna] == 1 && !visitado[fila][columna]);
+	}
 
-    }
+	void DFS(int M[][], int fila, int columna, boolean visitado[][])
+	{
+		int filaNbr[] = new int[] {};
+		int columnaNbr[] = new int[] {};
 
-    public void addEdge(String nombreUsuario, int id)
-    {
-        if(getvertices(nombreUsuario) == -1)
-        {
+		// Mark this cell as visited
+		visitado[fila][columna] = true;
 
-        }
-    }
+		// Recur for all connected neighbours
+		for (int k = 0; k < 8; ++k)
+			if (perimetro(M, fila + filaNbr[k], columna + columnaNbr[k], visitado))
+				DFS(M, fila + filaNbr[k], columna + columnaNbr[k], visitado);
+	}
 
+	int contIslas(int M[][])
+	{
 
-    public int[] recorrido(int vertice) 
-    {
+		boolean visitado[][] = new boolean[FILA][COL];
 
-        ArrayList<Integer> recorrido = new ArrayList<>(); 
+		int cont = 0;
+		for (int i = 0; i < FILA; ++i)
+			for (int j = 0; j < COL; ++j)
+				if (M[i][j] == 1 && !visitado[i][j])
+				{ DFS(M, i, j, visitado); 
+                                ++cont;}
 
-        for (int i = 0; i < vertices; i++) {
+		return cont;
+	}
 
-            if(adjmatrix[vertice][i] == 0)
-            {
-                recorrido.add(i);
-            }
-        }
-
-        int size = recorrido.size();
-
-        int[] neighbor = new int[size];
-
-        for(int i = 0; i < size; i++){
-
-            neighbor[i] = recorrido.get(i);
-        }
-        return neighbor;
-    }
-
-    public void camino(String nombreUsuario, int id)
-    {
-
-    }
-
-    private int getvertices(String nombreUsuario) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
+	public static void main(String[] args) throws java.lang.Exception
+	{
+		int M[][] = new int[][] { {},};
+		Islas I = new Islas();
+		System.out.println("El total es : " + I.contIslas(M));
+	}
 }
