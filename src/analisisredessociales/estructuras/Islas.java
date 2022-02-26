@@ -8,7 +8,6 @@ package analisisredessociales.estructuras;
 import analisisredessociales.dominio.Usuario;
 import analisisredessociales.estructuras.RedSocial;
 
-// Java program to count islands in boolean 2D matrix
 import java.util.*;
 import java.lang.*;
 import java.io.*;
@@ -29,10 +28,8 @@ class Islas {
 		int filaNbr[] = new int[] {};
 		int columnaNbr[] = new int[] {};
 
-		// Mark this cell as visited
 		visitado[fila][columna] = true;
 
-		// Recur for all connected neighbours
 		for (int k = 0; k < 8; ++k)
 			if (perimetro(M, fila + filaNbr[k], columna + columnaNbr[k], visitado))
 				DFS(M, fila + filaNbr[k], columna + columnaNbr[k], visitado);
@@ -53,7 +50,7 @@ class Islas {
 		return cont;
 	}
 
-	public static void main(String[] args) throws java.lang.Exception
+	public void main(String[] args) throws java.lang.Exception
 	{
 		int M[][] = new int[][] { {},};
 		Islas I = new Islas();
