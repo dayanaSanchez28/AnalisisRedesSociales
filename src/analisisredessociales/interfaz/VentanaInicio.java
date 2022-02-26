@@ -88,9 +88,19 @@ public class VentanaInicio extends javax.swing.JFrame {
         botonera.add(botonMostrar);
 
         botonContarIslas.setText("Contar Islas");
+        botonContarIslas.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                botonContarIslasActionPerformed(evt);
+            }
+        });
         botonera.add(botonContarIslas);
 
         botonIdentificarPuentes.setText("Identificar Puentes");
+        botonIdentificarPuentes.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                botonIdentificarPuentesActionPerformed(evt);
+            }
+        });
         botonera.add(botonIdentificarPuentes);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -145,6 +155,14 @@ public class VentanaInicio extends javax.swing.JFrame {
             vistaGrafo.setVisible(true);
         });
     }//GEN-LAST:event_botonMostrarActionPerformed
+
+    private void botonIdentificarPuentesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonIdentificarPuentesActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_botonIdentificarPuentesActionPerformed
+
+    private void botonContarIslasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonContarIslasActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_botonContarIslasActionPerformed
 
     private void actualizarEstadistica(int estadistica, String valor) {
         String estadisticasHTML = lblValoresEstadisticas.getText();

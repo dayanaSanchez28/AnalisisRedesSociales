@@ -77,11 +77,17 @@
           <Properties>
             <Property name="text" type="java.lang.String" value="Contar Islas"/>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="botonContarIslasActionPerformed"/>
+          </Events>
         </Component>
         <Component class="javax.swing.JButton" name="botonIdentificarPuentes">
           <Properties>
             <Property name="text" type="java.lang.String" value="Identificar Puentes"/>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="botonIdentificarPuentesActionPerformed"/>
+          </Events>
         </Component>
       </SubComponents>
     </Container>
