@@ -8,6 +8,7 @@ package analisisredessociales.interfaz;
 import analisisredessociales.archivos.ManejadorArchivos;
 import analisisredessociales.dominio.Usuario;
 import analisisredessociales.estructuras.RedSocial;
+import analisisredessociales.estructuras.algoritmos.IdentificadorPuentes;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import org.graphstream.graph.Edge;
@@ -33,9 +34,25 @@ public class VentanaInicio extends javax.swing.JFrame implements ViewerListener 
                                             "text-background-color: white;" +
                                             "size: 25px;" +
                                             "}" +
+                                            "node.hovered {" + 
+                                            "stroke-color: darkred;" +
+                                            "text-color: darkred;" + 
+                                            "}" +
+                                            "node.seleccionado {" + 
+                                            "stroke-color: green;" +
+                                            "text-color: green;" + 
+                                            "}" +
                                             "graph {" +
                                             "padding: 40px;" +
-                                            "}";
+                                            "}" +
+                                            "edge {" +
+                                            "text-alignment: above;" +
+                                            "text-size: 14;" +
+                                            "}" +
+                                            "edge.puente {" +
+                                            "stroke-mode: plain;" +
+                                            "fill-color: red;"+
+                                            "}" ;
     private static final int ESTADISTICA_ULTIMO_LEIDO = 0;
     private RedSocial redSocial;
     private Usuario usuarioSeleccionado;
@@ -138,6 +155,7 @@ public class VentanaInicio extends javax.swing.JFrame implements ViewerListener 
         botoneraGrafo.add(botonCargaArchivo);
 
         botonGuardarArchivo.setText("Guardar");
+        botonGuardarArchivo.setEnabled(false);
         botonGuardarArchivo.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 botonGuardarArchivoActionPerformed(evt);
@@ -146,9 +164,16 @@ public class VentanaInicio extends javax.swing.JFrame implements ViewerListener 
         botoneraGrafo.add(botonGuardarArchivo);
 
         botonContarIslas.setText("Contar Islas");
+        botonContarIslas.setEnabled(false);
         botoneraGrafo.add(botonContarIslas);
 
         botonIdentificarPuentes.setText("Identificar Puentes");
+        botonIdentificarPuentes.setEnabled(false);
+        botonIdentificarPuentes.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                botonIdentificarPuentesActionPerformed(evt);
+            }
+        });
         botoneraGrafo.add(botonIdentificarPuentes);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -222,6 +247,7 @@ public class VentanaInicio extends javax.swing.JFrame implements ViewerListener 
         botoneraNodos.add(filler2, gridBagConstraints);
 
         botonEliminar.setText("Eliminar");
+        botonEliminar.setEnabled(false);
         botonEliminar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 botonEliminarActionPerformed(evt);
@@ -238,6 +264,7 @@ public class VentanaInicio extends javax.swing.JFrame implements ViewerListener 
         botoneraNodos.add(filler4, gridBagConstraints);
 
         botonNuevo.setText("Añadir usuario");
+        botonNuevo.setEnabled(false);
         botonNuevo.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 botonNuevoActionPerformed(evt);
@@ -285,6 +312,10 @@ public class VentanaInicio extends javax.swing.JFrame implements ViewerListener 
             redSocial = RedSocial.importar(contenidos);
             inicializarGrafo();
             actualizarEstadistica(ESTADISTICA_ULTIMO_LEIDO, ManejadorArchivos.getUltimoLeido());
+            botonContarIslas.setEnabled(true);
+            botonGuardarArchivo.setEnabled(true);
+            botonNuevo.setEnabled(true);
+            botonIdentificarPuentes.setEnabled(true);
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, e.getMessage(), "Error al importar archivo", JOptionPane.ERROR_MESSAGE);
             e.printStackTrace();
@@ -331,10 +362,24 @@ public class VentanaInicio extends javax.swing.JFrame implements ViewerListener 
             txtNombreNuevoUsuario.setText("");
             txtRelacionesNuevoUsuario.setText("");
             dialogoCreacion.dispose();
+            seleccionarUsuario(nuevo);
         } catch (RuntimeException e) {
             JOptionPane.showMessageDialog(this, e.getMessage(), "No se pudo insertar", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_btnGuardarActionPerformed
+
+    private void botonIdentificarPuentesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonIdentificarPuentesActionPerformed
+        IdentificadorPuentes identificadorPuentes = new IdentificadorPuentes(redSocial);
+        Usuario[][] puentes = identificadorPuentes.identificarPuentes();
+        StringBuilder sb = new StringBuilder("Se identificaron " + identificadorPuentes.getIdentificados() + " puentes:\n");
+        for (int i = 0; i < identificadorPuentes.getIdentificados(); i++) {
+            Usuario[] puente = puentes[i];
+            sb.append(puente[0].getNombreUsuario() + " (ID=" + puente[0].getId() + ") <=> " + puente[1].getNombreUsuario() + " (ID=" + puente[1].getId() +")\n");
+            grafo.getEdge(puente[0].getId() + "-" + puente[1].getId()).setAttribute("ui.class", "puente");
+        }
+        sb.append("Estos han sido marcados en el grafo para su visualización\n");
+        JOptionPane.showMessageDialog(this, sb.toString(), "Resultados de identifiación de puentes", JOptionPane.INFORMATION_MESSAGE);
+    }//GEN-LAST:event_botonIdentificarPuentesActionPerformed
 
     private void actualizarEstadistica(int estadistica, String valor) {
         String estadisticasHTML = lblValoresEstadisticas.getText();
@@ -352,7 +397,7 @@ public class VentanaInicio extends javax.swing.JFrame implements ViewerListener 
 
     @Override
     public void buttonPushed(String string) {
-        
+        System.out.println("buttonPushed" + string);
     }
 
     @Override
@@ -367,13 +412,17 @@ public class VentanaInicio extends javax.swing.JFrame implements ViewerListener 
     @Override
     public void mouseOver(String id) {
         Node nodo = grafo.getNode(id);
-        nodo.setAttribute("ui.class", "hovered");
+        if (!nodo.hasAttribute("ui.class")) {
+            nodo.setAttribute("ui.class", "hovered");
+        }
     }
 
     @Override
     public void mouseLeft(String string) {
         Node nodo = grafo.getNode(string);
-        nodo.removeAttribute("ui.class");
+        if ("hovered".equals(nodo.getAttribute("ui.class", String.class))) {
+            nodo.removeAttribute("ui.class");    
+        }
     }
 
     private int[][] procesarNuevasRelaciones(String relaciones) {
@@ -402,9 +451,18 @@ public class VentanaInicio extends javax.swing.JFrame implements ViewerListener 
     }
     
     private void seleccionarUsuario(Usuario usuario) {
+        if (usuarioSeleccionado != null) {
+            grafo.getNode(String.valueOf(usuarioSeleccionado.getId()))
+                    .removeAttribute("ui.class");
+        }
         usuarioSeleccionado = usuario;
         txtIdUsuario.setText(usuario == null ? "" : String.valueOf(usuario.getId()));
         txtNombreUsuario.setText(usuario == null ? "" : usuario.getNombreUsuario());
+        botonEliminar.setEnabled(usuario != null);
+        if (usuario != null) {
+            grafo.getNode(String.valueOf(usuario.getId()))
+                    .setAttribute("ui.class", "seleccionado");
+        }
     }
     
     private void inicializarGrafo() {
@@ -418,6 +476,9 @@ public class VentanaInicio extends javax.swing.JFrame implements ViewerListener 
         grafo.setAttribute("ui.stylesheet", CSS_GRAFO);
         grafo.setAttribute("ui.quality");
         grafo.setAttribute("ui.antialias");
+        grafo.setAttribute("layout.force", 0.2);
+        grafo.setAttribute("layout.quality", 4);
+        grafo.setAttribute("layout.stabilization-limit", 0.3);
         panelGrafo.add(view);
         // Empezar a escuchar eventos
         ViewerPipe pipe = swingViewer.newViewerPipe();
@@ -447,10 +508,12 @@ public class VentanaInicio extends javax.swing.JFrame implements ViewerListener 
                 }
             }
             Node nodo = grafo.getNode(String.valueOf(usuarioA.getId()));
-            if (null != nodo) {
-                nodo.setAttribute("ui.label", String.valueOf(usuarioA.getId()));
-                nodo.setAttribute("datosUsuario", usuarioA);
+            if (null == nodo) {
+                nodo = grafo.addNode(String.valueOf(usuarioA.getId()));
+                
             }
+            nodo.setAttribute("ui.label", String.valueOf(usuarioA.getId()));
+            nodo.setAttribute("datosUsuario", usuarioA);
         }
         
         return grafo;
