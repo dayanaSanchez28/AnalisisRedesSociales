@@ -161,7 +161,7 @@ public class VentanaInicio extends javax.swing.JFrame {
     }//GEN-LAST:event_botonIdentificarPuentesActionPerformed
 
     private void botonContarIslasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonContarIslasActionPerformed
-        // TODO add your handling code here:
+        String DFS = redSocial.cont();
     }//GEN-LAST:event_botonContarIslasActionPerformed
 
     private void actualizarEstadistica(int estadistica, String valor) {

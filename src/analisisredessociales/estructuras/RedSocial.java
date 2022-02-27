@@ -170,6 +170,10 @@ public class RedSocial {
         size--;
         tablaIndices.eliminar(usuario.getId());
     }
+
+    public String cont() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
     
     class Islas{
 
@@ -182,8 +186,7 @@ public class RedSocial {
 		return (fila >= 0) && (fila < FILA) && (columna >= 0) && (columna < COL) && (M[fila][columna] == 1 && !visitado[fila][columna]);
 	}
 
-	void DFS(int M[][], int fila, int columna, boolean visitado[][])
-	{
+	String DFS(int M[][], int fila, int columna, boolean visitado[][]){
 		int filaNbr[] = new int[] {};
 		int columnaNbr[] = new int[] {};
 
@@ -192,6 +195,7 @@ public class RedSocial {
 		for (int k = 0; k < 8; ++k)
 			if (perimetro(M, fila + filaNbr[k], columna + columnaNbr[k], visitado))
 				DFS(M, fila + filaNbr[k], columna + columnaNbr[k], visitado);
+            return "";
 	}
 
 	int contIslas(int M[][])
