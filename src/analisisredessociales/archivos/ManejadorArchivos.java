@@ -12,13 +12,16 @@ import java.nio.file.Files;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 
 public class ManejadorArchivos {
     private static String ultimoLeido;
     public static String seleccionArchivo(JFrame jFrame) {
         try {
+            FileNameExtensionFilter filter = new FileNameExtensionFilter("Archivos de texto", "txt");
             JFileChooser seleccionador = new JFileChooser();
+            seleccionador.setFileFilter(filter);
             seleccionador.showOpenDialog(jFrame);
             File archivoSeleccionado = seleccionador.getSelectedFile();
             if (null == archivoSeleccionado) {
@@ -43,7 +46,9 @@ public class ManejadorArchivos {
     
     public static boolean guardarEnArchivo(String contenido, JFrame jFrame) {
         try {
+            FileNameExtensionFilter filter = new FileNameExtensionFilter("Archivos de texto", "txt");
             JFileChooser guardador = new JFileChooser();
+            guardador.setFileFilter(filter);
             guardador.showSaveDialog(jFrame);
             File guardado = guardador.getSelectedFile();
             if (null == guardado) {

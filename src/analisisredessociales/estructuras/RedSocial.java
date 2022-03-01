@@ -14,28 +14,28 @@ public class RedSocial {
     private final TablaIndices tablaIndices;
     private int[][] relaciones;
     private int size = 0;
+    private static int MAX_SIZE = 100;
 
     /**
      * Crea un nuevo grafo de red social vacío
-     * @param size El tamaño de la red social
      */
-    public RedSocial(int size) {
-        this.usuarios = new Usuario[size];
-        this.relaciones = new int[size][size];
-        this.tablaIndices = new TablaIndices(size);
+    public RedSocial() {
+        this.usuarios = new Usuario[MAX_SIZE];
+        this.relaciones = new int[MAX_SIZE][MAX_SIZE];
+        this.tablaIndices = new TablaIndices(MAX_SIZE);
     }
     
     public static RedSocial importar(String contenido) {
         String[] lineas = contenido.split("\n");
         ListaUsuarios listaImportacion = new ListaUsuarios();
-        boolean eindicetraccionUsuariosCompleta = false;
+        boolean extraccionUsuariosCompleta = false;
         int i = 0;
-        for (; !eindicetraccionUsuariosCompleta; i++) {
+        for (; !extraccionUsuariosCompleta; i++) {
             String linea = lineas[i].trim();
             if ("Relaciones".equals(linea)) {
-                eindicetraccionUsuariosCompleta = true;
+                extraccionUsuariosCompleta = true;
             } else if (!"Usuarios".equals(linea)) {
-                String[] componentes = linea.split(", ");
+                String[] componentes = linea.split(", ?");
                 if (componentes.length == 2) {
                     // usuario
                     int id = Integer.parseInt(componentes[0]);
@@ -44,7 +44,7 @@ public class RedSocial {
                 }
             }
         }
-        RedSocial redSocial = new RedSocial(listaImportacion.getSize());
+        RedSocial redSocial = new RedSocial();
         NodoUsuario nodo = listaImportacion.getCabeza();
         while (nodo != null) {
             redSocial.insertarUsuario(nodo.getUsuario());
@@ -53,7 +53,7 @@ public class RedSocial {
         
         for (; i < lineas.length; i++) {
             String linea = lineas[i].trim();
-            String[] componentes = linea.split(", ");
+            String[] componentes = linea.split(", ?");
             if (componentes.length == 3) {
                 // relacion
                 int idA = Integer.parseInt(componentes[0]);
@@ -67,17 +67,8 @@ public class RedSocial {
     }
     
     public void insertarUsuario(Usuario usuario) {
-        if (size == usuarios.length - 1) {
-            int longitudActual = usuarios.length;
-            int nuevaLongitud = (int) (longitudActual * 1.5);
-            // Llegamos al limite, eindicepandamos los arrays internos
-            usuarios = Arrays.copyOf(usuarios, nuevaLongitud);
-            relaciones = Arrays.copyOf(relaciones, nuevaLongitud);
-            for (int i = 0; i < nuevaLongitud; i++) {
-                relaciones[i] = relaciones[i] == null 
-                        ? new int[nuevaLongitud]
-                        : Arrays.copyOf(relaciones[i], nuevaLongitud);
-            }
+        if (size == MAX_SIZE) {
+            throw new RuntimeException("No se pueden insertar más usuarios en la Red Social");
         }
         usuarios[size] = usuario;
         tablaIndices.insertar(usuario.getId(), size++);
@@ -128,8 +119,8 @@ public class RedSocial {
     
     public int getNumeroRelaciones() {
         int num = 0;
-        for (int i = 0; i < relaciones.length; i++) {
-            for (int j = i; j < relaciones.length; j++) {
+        for (int i = 0; i < size; i++) {
+            for (int j = i; j < size; j++) {
                 if (relaciones[i][j] != 0) {
                     num++;
                 }
