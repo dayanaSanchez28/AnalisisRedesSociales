@@ -15,8 +15,18 @@ import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 
+/**
+ * Clase utiliaria para el manejo de archivos
+ * @author Dayana
+ */
 public class ManejadorArchivos {
     private static String ultimoLeido;
+    
+    /**
+     * Abre la selección de archivos para cargar un txt en el sistema.
+     * @param jFrame 
+     * @return El contenito del txt
+     */
     public static String seleccionArchivo(JFrame jFrame) {
         try {
             FileNameExtensionFilter filter = new FileNameExtensionFilter("Archivos de texto", "txt");
@@ -36,6 +46,10 @@ public class ManejadorArchivos {
         }
     }
 
+    /**
+     * Ruta hacia el ultimo archivo leído
+     * @return 
+     */
     public static String getUltimoLeido() {
         return ultimoLeido;
     }
@@ -44,6 +58,12 @@ public class ManejadorArchivos {
         return seleccionArchivo(null);
     }
     
+    /**
+     * Guarda el contenido recibido como argumento, en un archivo que seleccione el usuario a través de un JFileChooser
+     * @param contenido
+     * @param jFrame
+     * @return el resultado de éxito de la operación
+     */
     public static boolean guardarEnArchivo(String contenido, JFrame jFrame) {
         try {
             FileNameExtensionFilter filter = new FileNameExtensionFilter("Archivos de texto", "txt");

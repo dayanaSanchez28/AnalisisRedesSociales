@@ -9,7 +9,7 @@ import analisisredessociales.dominio.Usuario;
 import analisisredessociales.estructuras.RedSocial;
 
 /**
- *
+ * Algoritmo de identificación de puentes en un grafo
  * @author Dayana
  */
 public class IdentificadorPuentes {
@@ -24,6 +24,14 @@ public class IdentificadorPuentes {
         this.matrizAdyacencia = this.redSocial.getRelaciones();
     }
     
+    /**
+     * Aplica DFS para ubicar los puentes en el grafo
+     * @param nodoActual el nodo que se está visitando
+     * @param visitados array de indices visitados
+     * @param tDescubrimiento array de tiempos de descubrimiento de cada nodo
+     * @param tBajo array de tiempos menores de descubrimiento para cada nodo
+     * @param padre array de padres de cada nodo.
+     */
     private void dfsRecursivo(int nodoActual, boolean[] visitados, int[] tDescubrimiento, int[] tBajo, int[] padre) {
         // Marcamos el nodo actual como visitado
         visitados[nodoActual] = true;
@@ -63,6 +71,10 @@ public class IdentificadorPuentes {
         }
     }
     
+    /**
+     * Obtención del recuendo de puentes, el cual consta de una matriz Nx2 de usuarios, donde las filas son los puentes y las columnas los usuarios que conforman esos puentes.
+     * @return La matriz de puentes
+     */
     public Usuario[][] identificarPuentes() {
         int size = redSocial.getSize();
         boolean[] visitados = new boolean[size];

@@ -5,7 +5,11 @@
  */
 package analisisredessociales.dominio;
 
-
+/**
+ * Usuario de la Red Social, un objeto sencillo que guarda información sobre el id y el nombre de usuario.
+ * No tiene métodos más que los getters y setters convencionales
+ * @author Dayana
+ */
 public class Usuario {
     private int id;
     private String nombreUsuario;

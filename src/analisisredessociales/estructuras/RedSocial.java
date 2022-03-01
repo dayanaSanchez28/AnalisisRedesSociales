@@ -6,10 +6,13 @@
 package analisisredessociales.estructuras;
 
 import analisisredessociales.dominio.Usuario;
-import java.util.Arrays;
 
-
+/**
+ * Grafo de Usuarios que usa matriz de adyacencia para la gestión de relaciones
+ * @author Dayana
+ */
 public class RedSocial {
+
     private Usuario[] usuarios;
     private final TablaIndices tablaIndices;
     private int[][] relaciones;
@@ -24,7 +27,12 @@ public class RedSocial {
         this.relaciones = new int[MAX_SIZE][MAX_SIZE];
         this.tablaIndices = new TablaIndices(MAX_SIZE);
     }
-    
+
+    /**
+     * Método utilitario para procesar los datos de una red social como un string y crear una instancia a partir de esta
+     * @param contenido El contenido a procesar
+     * @return 
+     */
     public static RedSocial importar(String contenido) {
         String[] lineas = contenido.split("\n");
         ListaUsuarios listaImportacion = new ListaUsuarios();
@@ -50,7 +58,7 @@ public class RedSocial {
             redSocial.insertarUsuario(nodo.getUsuario());
             nodo = nodo.getSiguiente();
         }
-        
+
         for (; i < lineas.length; i++) {
             String linea = lineas[i].trim();
             String[] componentes = linea.split(", ?");
@@ -62,10 +70,14 @@ public class RedSocial {
                 redSocial.establecerRelacion(idA, idB, tiempo);
             }
         }
-        
+
         return redSocial;
     }
-    
+
+    /**
+     * Inserta un nuevo usuario en la Red Social, equivalente a insertar un nodo en el grafo
+     * @param usuario el Usuario a insertar
+     */
     public void insertarUsuario(Usuario usuario) {
         if (size == MAX_SIZE) {
             throw new RuntimeException("No se pueden insertar más usuarios en la Red Social");
@@ -73,11 +85,20 @@ public class RedSocial {
         usuarios[size] = usuario;
         tablaIndices.insertar(usuario.getId(), size++);
     }
-    
+
+    /**
+     * Crea una nueva relación entre 2 usuarios con un tiempo determinado, equivalente a crear una arista en el grafo
+     * @param a uno de los usuarios de la relación
+     * @param b el otro usuario de la relación
+     * @param tiempo el tiempo que se conocen
+     */
     public void establecerRelacion(Usuario a, Usuario b, int tiempo) {
         establecerRelacion(a.getId(), b.getId(), tiempo);
     }
-    
+
+    /**
+     * @inheritDoc
+     */
     public void establecerRelacion(int idA, int idB, int tiempo) {
         int indiceA = encontrarIndiceId(idA);
         int indiceB = encontrarIndiceId(idB);
@@ -86,11 +107,20 @@ public class RedSocial {
             relaciones[indiceB][indiceA] = tiempo;
         }
     }
-    
+
+    /**
+     * Devuelve el indice de un usuario dentro del grafo a partir de su ID
+     * @param id el id a usuario a encontrar
+     * @return el indice del usuario
+     */
     private int encontrarIndiceId(int id) {
         return tablaIndices.getIndice(id);
     }
-    
+
+    /**
+     * Devuelve una representación en string de la Red Social que se puede usar para volver a recrearla con el método de importación
+     * @return 
+     */
     public String exportar() {
         StringBuilder sb = new StringBuilder();
         sb.append("Usuarios\n");
@@ -107,16 +137,24 @@ public class RedSocial {
                     sb.append(usuarioA.getId()).append(", ").append(usuarioB.getId()).append(", ").append(relaciones[i][j]).append("\n");
                 }
             }
-            
+
         }
-        
+
         return sb.toString();
     }
 
+    /**
+     * Devuelve la cantidad de usuarios, equivalente a getSize
+     * @return 
+     */
     public int getNumeroUsuarios() {
         return getSize();
     }
-    
+
+    /**
+     * Devuelve la cantidad de relaciones que hay en la red social, equivalente al numero de aristas
+     * @return 
+     */
     public int getNumeroRelaciones() {
         int num = 0;
         for (int i = 0; i < size; i++) {
@@ -125,23 +163,40 @@ public class RedSocial {
                     num++;
                 }
             }
-            
+
         }
         return num;
     }
 
+    /**
+     * Devuelve la cantidad de usuarios en la Red Social, equivalente al número de nodos en el grafo.
+     * @return el tamaño del grafo
+     */
     public int getSize() {
         return size;
     }
 
+    /**
+     * Devuelve el array de Usuarios de la Red Social.
+     * @return el array de usuarios
+     */
     public Usuario[] getUsuarios() {
         return usuarios;
     }
 
+    /**
+     * Devuelve la matriz de adyacencia de la Red Social
+     * @return la matriz de adyacencia de la red social
+     */
     public int[][] getRelaciones() {
         return relaciones;
     }
-    
+
+    /**
+     * Elimina un usuario especifico de la Red Social.
+     * Este proceso consiste en correr todos los usuarios a la derecha de este, un espacio a la izquierda, lo mismo con sus relaciones
+     * @param usuario 
+     */
     public void eliminar(Usuario usuario) {
         int indice = tablaIndices.getIndice(usuario.getId());
         // TODO: Implementar método de eliminación del grafo
@@ -157,58 +212,8 @@ public class RedSocial {
             }
             indice++;
         }
- 
+
         size--;
         tablaIndices.eliminar(usuario.getId());
     }
-
-    public String cont() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-    
-    class Islas{
-
-	static final int FILA = 5, COL = 5;
-
-	boolean perimetro(int M[][], int fila, int columna,
-				boolean visitado[][])
-	{
-
-		return (fila >= 0) && (fila < FILA) && (columna >= 0) && (columna < COL) && (M[fila][columna] == 1 && !visitado[fila][columna]);
-	}
-
-	String DFS(int M[][], int fila, int columna, boolean visitado[][]){
-		int filaNbr[] = new int[] {};
-		int columnaNbr[] = new int[] {};
-
-		visitado[fila][columna] = true;
-
-		for (int k = 0; k < 8; ++k)
-			if (perimetro(M, fila + filaNbr[k], columna + columnaNbr[k], visitado))
-				DFS(M, fila + filaNbr[k], columna + columnaNbr[k], visitado);
-            return "";
-	}
-
-	int contIslas(int M[][])
-	{
-
-		boolean visitado[][] = new boolean[FILA][COL];
-
-		int cont = 0;
-		for (int i = 0; i < FILA; ++i)
-			for (int j = 0; j < COL; ++j)
-				if (M[i][j] == 1 && !visitado[i][j])
-				{ DFS(M, i, j, visitado); 
-                                ++cont;}
-
-		return cont;
-	}
-
-	public void main(String[] args) throws java.lang.Exception
-	{
-		int M[][] = new int[][] { {},};
-		Islas I = new Islas();
-		System.out.println("El total es : " + I.contIslas(M));
-	}
-}
 }

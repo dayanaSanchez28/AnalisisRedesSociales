@@ -9,6 +9,8 @@ import analisisredessociales.archivos.ManejadorArchivos;
 import analisisredessociales.dominio.Usuario;
 import analisisredessociales.estructuras.RedSocial;
 import analisisredessociales.estructuras.algoritmos.IdentificadorPuentes;
+import analisisredessociales.estructuras.algoritmos.Islas;
+import java.util.Arrays;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import org.graphstream.graph.Edge;
@@ -26,38 +28,40 @@ import org.graphstream.ui.view.ViewerPipe;
  * @author Dayana
  */
 public class VentanaInicio extends javax.swing.JFrame implements ViewerListener {
-    private final static String CSS_GRAFO = "node {" +
-                                            "fill-color: white;" +
-                                            "stroke-mode: plain;" +
-                                            "stroke-color: black;" +
-                                            "text-background-mode: plain;" +
-                                            "text-background-color: white;" +
-                                            "size: 25px;" +
-                                            "}" +
-                                            "node.hovered {" + 
-                                            "stroke-color: darkred;" +
-                                            "text-color: darkred;" + 
-                                            "}" +
-                                            "node.seleccionado {" + 
-                                            "stroke-color: green;" +
-                                            "text-color: green;" + 
-                                            "}" +
-                                            "graph {" +
-                                            "padding: 40px;" +
-                                            "}" +
-                                            "edge {" +
-                                            "text-alignment: above;" +
-                                            "text-size: 14;" +
-                                            "}" +
-                                            "edge.puente {" +
-                                            "stroke-mode: plain;" +
-                                            "fill-color: red;"+
-                                            "}" ;
+
+    private final static String CSS_GRAFO = "node {"
+            + "fill-color: white;"
+            + "stroke-mode: plain;"
+            + "stroke-color: black;"
+            + "text-background-mode: plain;"
+            + "text-background-color: white;"
+            + "size: 25px;"
+            + "}"
+            + "node.hovered {"
+            + "stroke-color: darkred;"
+            + "text-color: darkred;"
+            + "}"
+            + "node.seleccionado {"
+            + "stroke-color: green;"
+            + "text-color: green;"
+            + "}"
+            + "graph {"
+            + "padding: 40px;"
+            + "}"
+            + "edge {"
+            + "text-alignment: above;"
+            + "text-size: 14;"
+            + "}"
+            + "edge.puente {"
+            + "stroke-mode: plain;"
+            + "fill-color: red;"
+            + "}";
     private static final int ESTADISTICA_ULTIMO_LEIDO = 0;
     private RedSocial redSocial;
     private Usuario usuarioSeleccionado;
     private Graph grafo;
     private boolean loop = true;
+
     /**
      * Creates new form VentanaInicio
      */
@@ -89,6 +93,7 @@ public class VentanaInicio extends javax.swing.JFrame implements ViewerListener 
         botonGuardarArchivo = new javax.swing.JButton();
         botonContarIslas = new javax.swing.JButton();
         botonIdentificarPuentes = new javax.swing.JButton();
+        jLabel7 = new javax.swing.JLabel();
         panelGrafo = new javax.swing.JPanel();
         botoneraNodos = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
@@ -165,6 +170,11 @@ public class VentanaInicio extends javax.swing.JFrame implements ViewerListener 
 
         botonContarIslas.setText("Contar Islas");
         botonContarIslas.setEnabled(false);
+        botonContarIslas.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                botonContarIslasActionPerformed(evt);
+            }
+        });
         botoneraGrafo.add(botonContarIslas);
 
         botonIdentificarPuentes.setText("Identificar Puentes");
@@ -175,6 +185,9 @@ public class VentanaInicio extends javax.swing.JFrame implements ViewerListener 
             }
         });
         botoneraGrafo.add(botonIdentificarPuentes);
+
+        jLabel7.setText("Puede arrastrar los nodos del grafo con su cursor. Haga click en cualquier nodo para seleccionarlo");
+        botoneraGrafo.add(jLabel7);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -308,7 +321,7 @@ public class VentanaInicio extends javax.swing.JFrame implements ViewerListener 
             JOptionPane.showMessageDialog(this, "No se seleccionó archivo. No se tratará de cargar información", "Info", JOptionPane.WARNING_MESSAGE);
             return;
         }
-        try {    
+        try {
             redSocial = RedSocial.importar(contenidos);
             inicializarGrafo();
             actualizarEstadistica(ESTADISTICA_ULTIMO_LEIDO, ManejadorArchivos.getUltimoLeido());
@@ -320,7 +333,7 @@ public class VentanaInicio extends javax.swing.JFrame implements ViewerListener 
             JOptionPane.showMessageDialog(this, e.getMessage(), "Error al importar archivo", JOptionPane.ERROR_MESSAGE);
             e.printStackTrace();
         }
-        
+
     }//GEN-LAST:event_botonCargaArchivoActionPerformed
 
     private void botonGuardarArchivoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonGuardarArchivoActionPerformed
@@ -356,7 +369,7 @@ public class VentanaInicio extends javax.swing.JFrame implements ViewerListener 
             for (int i = 0; i < relacionesProcesadas.length; i++) {
                 int[] relacion = relacionesProcesadas[i];
                 redSocial.establecerRelacion(nuevo.getId(), relacion[0], relacion[1]);
-                grafo.addEdge(idUsuario + "-" + relacion[0], idUsuario, String.valueOf(relacion[0])).setAttribute("ui.label", relacion[1]);
+                grafo.addEdge(etiquetaArista(nuevo.getId(), relacion[0]), idUsuario, String.valueOf(relacion[0])).setAttribute("ui.label", relacion[1]);
             }
             txtIdNuevoUsuario.setText("");
             txtNombreNuevoUsuario.setText("");
@@ -368,24 +381,62 @@ public class VentanaInicio extends javax.swing.JFrame implements ViewerListener 
         }
     }//GEN-LAST:event_btnGuardarActionPerformed
 
+    private void botonContarIslasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonContarIslasActionPerformed
+        // Le preguntamos al usuario cuál es el recurrido que desea
+        Object seleccion = JOptionPane.showInputDialog(this, "Seleccione el recorrido a realizar", "Algoritmo de recorrido", JOptionPane.DEFAULT_OPTION, null, new String[]{"Recorrido anchura (BFS)", "Recorrido produnfidad (DFS)"}, "Recorrido anchura (BFS)");
+        // Procuramos que haya seleccionado algo
+        if (seleccion != null) {
+            // Extraemos el algoritmo de la seleccion del usuario
+            String algoritmo = seleccion.toString().substring(seleccion.toString().indexOf("(") + 1, seleccion.toString().indexOf(")"));
+            // creamos una instancia de la clase utilitaria para el conteo de islas
+            Islas islas = new Islas(redSocial);
+            int numIslas = islas.contIslas(algoritmo);
+            // Contruimos poco a poco el string con el orden de recorrido que se hizo.
+            StringBuilder sb = new StringBuilder("Se encontraron " + numIslas + " islas.\nEl orden de recorrido fue el siguiente\n");
+            int[][] ordenRecorrido = islas.getOrdenRecorrido();
+            Usuario[] usuarios = redSocial.getUsuarios();
+            for (int isla = 0; isla < numIslas; isla++) {
+                sb.append("Isla #").append(isla + 1).append(": ");
+                boolean fin = false;
+                int[] recorrido = ordenRecorrido[isla];
+                for (int u = 0; u < recorrido.length && !fin; u++) {
+                    if (u == recorrido.length - 1 || recorrido[u + 1] == 0) {
+                        fin = true;
+                    }
+                    // el orden de recorrido usa indices basados en 1 para el orden de usuarios
+                    sb.append(usuarios[recorrido[u] - 1].getId());
+                    if (!fin) {
+                        sb.append("->");
+                    }
+                }
+                sb.append("\n");
+            }
+            // Mostramos resultados finalmente
+            JOptionPane.showMessageDialog(this, sb.toString());
+        }
+    }//GEN-LAST:event_botonContarIslasActionPerformed
+
     private void botonIdentificarPuentesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonIdentificarPuentesActionPerformed
         IdentificadorPuentes identificadorPuentes = new IdentificadorPuentes(redSocial);
         Usuario[][] puentes = identificadorPuentes.identificarPuentes();
         StringBuilder sb = new StringBuilder("Se identificaron " + identificadorPuentes.getIdentificados() + " puentes:\n");
         for (int i = 0; i < identificadorPuentes.getIdentificados(); i++) {
             Usuario[] puente = puentes[i];
-            sb.append(puente[0].getNombreUsuario() + " (ID=" + puente[0].getId() + ") <=> " + puente[1].getNombreUsuario() + " (ID=" + puente[1].getId() +")\n");
-            grafo.getEdge(puente[0].getId() + "-" + puente[1].getId()).setAttribute("ui.class", "puente");
+            sb.append(puente[0].getNombreUsuario()).append(" (ID=").append(puente[0].getId()).append(") <=> ").append(puente[1].getNombreUsuario()).append(" (ID=").append(puente[1].getId()).append(")\n");
+            grafo.getEdge(etiquetaArista(puente[0].getId(), puente[1].getId())).setAttribute("ui.class", "puente");
         }
         sb.append("Estos han sido marcados en el grafo para su visualización\n");
         JOptionPane.showMessageDialog(this, sb.toString(), "Resultados de identifiación de puentes", JOptionPane.INFORMATION_MESSAGE);
     }//GEN-LAST:event_botonIdentificarPuentesActionPerformed
 
-    private void botonContarIslasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonContarIslasActionPerformed
-        String DFS = redSocial.cont();
-    }//GEN-LAST:event_botonContarIslasActionPerformed
+    private String etiquetaArista(int idA, int idB) {
+        // Estandarización de la formación de la etiqueta de aristas para el grafo visual
+        return Math.min(idA, idB) + "-" + Math.max(idA, idB);
+    }
 
     private void actualizarEstadistica(int estadistica, String valor) {
+        // Previamente habían más estadísticas a mostrar, no obstante esto fue cambiado al actualizar la UI y se decidió no refactorizar
+        // el método para ahorrar tiempo
         String estadisticasHTML = lblValoresEstadisticas.getText();
         String limpio = estadisticasHTML.replace("<html>", "").replace("</html>", "");
         String[] valoresEstadisticas = limpio.split("<br>");
@@ -393,15 +444,15 @@ public class VentanaInicio extends javax.swing.JFrame implements ViewerListener 
         String nuevasEstadisticas = "<html>" + String.join("<br>", valoresEstadisticas) + "</html>";
         lblValoresEstadisticas.setText(nuevasEstadisticas);
     }
-    
+
     @Override
     public void viewClosed(String string) {
+        // Dejamos de oir eventos
         loop = false;
     }
 
     @Override
     public void buttonPushed(String string) {
-        System.out.println("buttonPushed" + string);
     }
 
     @Override
@@ -425,11 +476,12 @@ public class VentanaInicio extends javax.swing.JFrame implements ViewerListener 
     public void mouseLeft(String string) {
         Node nodo = grafo.getNode(string);
         if ("hovered".equals(nodo.getAttribute("ui.class", String.class))) {
-            nodo.removeAttribute("ui.class");    
+            nodo.removeAttribute("ui.class");
         }
     }
 
     private int[][] procesarNuevasRelaciones(String relaciones) {
+        // Procesamos las nuevas relaciones cargadas al añadir usuarios
         String[] listaRelaciones = relaciones.split(",");
         int[][] procesadas = new int[listaRelaciones.length][2];
         String noProcesadas = "";
@@ -440,35 +492,39 @@ public class VentanaInicio extends javax.swing.JFrame implements ViewerListener 
                 try {
                     int id = Integer.parseInt(componentes[0]);
                     int tiempo = Integer.parseInt(componentes[1]);
-                    procesadas[i] = new int[] {id, tiempo};
+                    procesadas[i] = new int[]{id, tiempo};
                 } catch (NumberFormatException e) {
                     noProcesadas += e.getMessage();
                 }
             }
         }
-        
+
         if (!noProcesadas.isBlank()) {
             JOptionPane.showMessageDialog(this, "Ocurrieron los siguientes errores: \n" + noProcesadas + "\nLas relaciones que sí pudieron ser procesadas se agregarán", "Errores al procesar relaciones", JOptionPane.WARNING_MESSAGE);
         }
-        
+
         return procesadas;
     }
-    
+
     private void seleccionarUsuario(Usuario usuario) {
         if (usuarioSeleccionado != null) {
+            // Tenemos que deseleccionar visualmente al nodo del usuario
             grafo.getNode(String.valueOf(usuarioSeleccionado.getId()))
                     .removeAttribute("ui.class");
         }
+        // persistimos el nuevo usuario a seleccionar
         usuarioSeleccionado = usuario;
+        // Actualizamos campos no editables de datos del usuario seleccionado
         txtIdUsuario.setText(usuario == null ? "" : String.valueOf(usuario.getId()));
         txtNombreUsuario.setText(usuario == null ? "" : usuario.getNombreUsuario());
         botonEliminar.setEnabled(usuario != null);
         if (usuario != null) {
+            // Seleccionamos el nuevo usuario
             grafo.getNode(String.valueOf(usuario.getId()))
                     .setAttribute("ui.class", "seleccionado");
         }
     }
-    
+
     private void inicializarGrafo() {
         // construimos grafo visual a partir de la red social
         grafo = crearGrafoUI();
@@ -477,6 +533,7 @@ public class VentanaInicio extends javax.swing.JFrame implements ViewerListener 
         swingViewer.enableAutoLayout();
         ViewPanel view = (ViewPanel) swingViewer.addDefaultView(false);
         view.enableMouseOptions();
+        // Estética
         grafo.setAttribute("ui.stylesheet", CSS_GRAFO);
         grafo.setAttribute("ui.quality");
         grafo.setAttribute("ui.antialias");
@@ -488,6 +545,7 @@ public class VentanaInicio extends javax.swing.JFrame implements ViewerListener 
         ViewerPipe pipe = swingViewer.newViewerPipe();
         pipe.addViewerListener(this);
         pipe.addSink(grafo);
+        // Evitamos un ciclo infinito mientras escuchamos los eventos del grafo visual
         Thread t = new Thread(() -> {
             while (loop) {
                 pipe.pump();
@@ -495,11 +553,13 @@ public class VentanaInicio extends javax.swing.JFrame implements ViewerListener 
         });
         t.start();
     }
-    
+
     private Graph crearGrafoUI() {
+        // Se crea un grafo visual para mostrar en la UI a partir del grafo de la Red social
         Graph grafo = new SingleGraph("Red Social", false, true);
         int[][] relaciones = redSocial.getRelaciones();
         Usuario[] usuarios = redSocial.getUsuarios();
+        // Iteramos por todas las relaciones y cargamos las aristas
         for (int i = 0; i < redSocial.getSize(); i++) {
             int[] fila = relaciones[i];
             Usuario usuarioA = usuarios[i];
@@ -507,22 +567,23 @@ public class VentanaInicio extends javax.swing.JFrame implements ViewerListener 
                 Usuario usuarioB = usuarios[j];
                 int tiempo = relaciones[i][j];
                 if (tiempo != 0) {
-                    Edge arista = grafo.addEdge(usuarioA.getId() + "-" + usuarioB.getId(), String.valueOf(usuarioA.getId()), String.valueOf(usuarioB.getId()));
+                    Edge arista = grafo.addEdge(etiquetaArista(usuarioA.getId(), usuarioB.getId()), String.valueOf(usuarioA.getId()), String.valueOf(usuarioB.getId()));
                     arista.setAttribute("ui.label", String.valueOf(tiempo));
                 }
             }
             Node nodo = grafo.getNode(String.valueOf(usuarioA.getId()));
             if (null == nodo) {
+                // si un noodo no fue creado a partir de sus aristas (ej el nodo no tenia ninguna relacion) entonces se agrega manualmente.
                 nodo = grafo.addNode(String.valueOf(usuarioA.getId()));
-                
+
             }
             nodo.setAttribute("ui.label", String.valueOf(usuarioA.getId()));
             nodo.setAttribute("datosUsuario", usuarioA);
         }
-        
+
         return grafo;
     }
-    
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton botonCargaArchivo;
     private javax.swing.JButton botonContarIslas;
@@ -545,6 +606,7 @@ public class VentanaInicio extends javax.swing.JFrame implements ViewerListener 
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel lblNombreEstadisticas;
     private javax.swing.JLabel lblTitulo;
     private javax.swing.JLabel lblValoresEstadisticas;

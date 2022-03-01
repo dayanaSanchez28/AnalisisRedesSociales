@@ -7,7 +7,10 @@ package analisisredessociales.estructuras;
 
 import analisisredessociales.dominio.Usuario;
 
-
+/**
+ * Clase meramente utilitaria que representa un Nodo de un Usuario
+ * @author Dayana
+ */
 public class NodoUsuario {
     private final Usuario usuario;
     private NodoUsuario siguiente;

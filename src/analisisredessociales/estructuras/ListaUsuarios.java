@@ -7,11 +7,18 @@ package analisisredessociales.estructuras;
 
 import analisisredessociales.dominio.Usuario;
 
-
+/**
+ * Lista simplemente enlazada de usuarios
+ * @author Dayana
+ */
 public class ListaUsuarios {
     private NodoUsuario cabeza = null;
     private int size = 0;
 
+    /**
+     * Inserta un nuevo usuario en la lista simplemente enlazada (inserción por cola)
+     * @param usuario 
+     */
     public void insertar(Usuario usuario) {
         NodoUsuario nodo = new NodoUsuario(usuario);
         if (cabeza == null) {

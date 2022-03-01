@@ -5,8 +5,10 @@
  */
 package analisisredessociales.estructuras;
 
-import java.util.Arrays;
-
+/**
+ * Tabla hash sencilla cuyo propósito es acelerar la búsqueda de indices en el grafo
+ * @author Dayana
+ */
 public class TablaIndices {
     private FilaIndice[] filas;
     private int filasLlenas = 0;
@@ -14,6 +16,11 @@ public class TablaIndices {
         this.filas = new FilaIndice[size];
     }
     
+    /**
+     * INserta una nueva entrada en la tabla hash
+     * @param id El ID del usuario
+     * @param indice El indice del usuario dentro del array del grafo
+     */
     public void insertar(int id, int indice) {
         int fila = funcionHash(id);
         FilaIndice nuevaFila = new FilaIndice(id, indice);
@@ -35,6 +42,11 @@ public class TablaIndices {
         filasLlenas++;
     }
     
+    /**
+     * Obtiene el indice de un usuario apartir de su ID
+     * @param id el ID del usuario
+     * @return el indice del usuario dentro del array del grafo
+     */
     public int getIndice(int id) {
         int numFila = funcionHash(id);
         // Revisamos si está ocupado
@@ -49,14 +61,27 @@ public class TablaIndices {
         return nodo == null ? -1 : nodo.indice;
     }
     
+    /**
+     * Determina si una fila está ocupada
+     * @param fila la fila a revisar
+     * @return 
+     */
     private boolean ocupado(int fila) {
         return filas[fila] != null;
     }
     
+    /**
+     * función de hash para el almacenamiento eficiente dentro de la tabla
+     * @param id el ID a hashear
+     * @return el ID hasheado
+     */
     private int funcionHash(int id) {
         return (filas.length - 1) & Integer.hashCode(id);
     }
     
+    /**
+     * Clase interna que representa una entrada de la tabla hash.
+     */
     private class FilaIndice {
         private final int id;
         private final int indice;
